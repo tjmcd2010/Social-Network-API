@@ -1,4 +1,4 @@
-const { ObjectId } = require('mongoose').Types;
+
 const { User, Thought } = require('../models');
 
 module.exports = {
@@ -8,9 +8,11 @@ module.exports = {
             const users = await User.find();
             res.json(users);
         } catch (err) {
+            console.log(err);
             res.status(500).json(err);
         }
     },
+    
     // get a single user by its _id and populated thought and friend data
     async getSingleUser(req, res) {
         try {
@@ -26,6 +28,7 @@ module.exports = {
             const user = await User.create(req.body);
             res.json(user);
         } catch (err) {
+            console.log(err);
             res.status(500).json(err);
         }
     },
@@ -38,28 +41,21 @@ module.exports = {
             res.status(500).json(err);
         }
     },
-    // delete a user by its _id
-    async deleteUser(req, res) {
+    // delete a user by its _id remove a user's associated 
+    //thoughts when user id is deleted
+
+        async deleteUser(req, res) {
         try {
             const user = await User.findByIdAndDelete(req.params.id);
-            res.json(user);
+            await Thought.deleteMany({ _id: { $in: user.thoughts } });
+            res.json({ message: 'User and associated thoughts deleted!' });
         } catch (err) {
             res.status(500).json(err);
         }
     },
-    // remove a user's associated thoughts when user id is deleted
-    async deleteThoughts(req, res) {
-        try {
-            const user = await User.findByIdAndUpdate(
-                req.params.userId,
-                { $pull: { thoughts: req.params.thoughtId } },
-                { new: true }
-            );
-            res.json(user);
-        } catch (err) {
-            res.status(500).json(err);
-        }
-    },
+
+
+
     // post route to add a new friend to a user's friend list
     async addFriend(req, res) {
         try {

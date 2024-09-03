@@ -7,7 +7,7 @@ const userSchema = new Schema(
     thoughts: [{type: Schema.Types.ObjectId, ref: 'Thought'}],
     friends: [{type: Schema.Types.ObjectId, ref: 'User'}]
   }, // set to true to use virtual below    
-  {toJSON: {virtuals: true}, id: false
+  {toJSON: {getters: true, virtuals: true}, id: false
 });
 
 
@@ -19,7 +19,7 @@ userSchema.virtual('friendCount').get(function() {
   });
 
   
-  const User = model('User', userSchema);
+  const User = model('user', userSchema);
 
 
-  model.exports = User;
+  module.exports = User;
